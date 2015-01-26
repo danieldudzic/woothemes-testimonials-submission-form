@@ -13,6 +13,15 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
  * @since 1.6.0
  */
 class Submission_Form {
+
+	/**
+	 * Submission_Form The single instance of Submission_Form.
+	 * @var 	object
+	 * @access  private
+	 * @since 	1.0.0
+	 */
+	private static $_instance = null;
+
 	/**
 	 * The class file path.
 	 * @var     string
@@ -80,6 +89,21 @@ class Submission_Form {
 		add_action( 'woothemes_testimonials_before_form', array( $this, 'print_response' ) );
 
 	} // End __construct()
+
+	/**
+	* Main Submission_Form Instance
+	*
+	* Ensures only one instance of Submission_Form is loaded or can be loaded.
+	*
+	* @since 1.0.0
+	* @static
+	* @return Main Submission_Form instance
+	*/
+	public static function instance ( $file ) {
+		if ( is_null( self::$_instance ) )
+			self::$_instance = new self( $file );
+		return self::$_instance;
+	} // End instance()
 
 	/**
 	 * Enqueue testimonials submission form CSS.

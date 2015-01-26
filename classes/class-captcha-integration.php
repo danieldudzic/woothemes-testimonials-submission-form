@@ -17,6 +17,14 @@ class Captcha_Integration {
 	public $captcha_option;
 
 	/**
+	 * Captcha_Integration The single instance of Captcha_Integration.
+	 * @var 	object
+	 * @access  private
+	 * @since 	1.0.0
+	 */
+	private static $_instance = null;
+
+	/**
 	 * Constructor function.
 	 *
 	 * @access public
@@ -37,6 +45,22 @@ class Captcha_Integration {
 			add_filter( 'woothemes_testimonials_validate_hooked_data', array( $this, 'validate_captcha_field' ), 10, 3 );
 		}
 	}
+
+	/**
+	* Main Captcha_Integration Instance
+	*
+	* Ensures only one instance of Captcha_Integration is loaded or can be loaded.
+	*
+	* @since 1.0.0
+	* @static
+	* @return Main Captcha_Integration instance
+	*/
+	public static function instance ( $file ) {
+		if ( is_null( self::$_instance ) )
+			self::$_instance = new self( $file );
+		return self::$_instance;
+	} // End instance()
+
 
 	/**
 	 * Check if the plugin is active and if the "captcha" param was set in the shortcode.

@@ -26,11 +26,19 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @since  1.0.0
  * @return object WooThemes_Testimonials_Submission_Form
  */
-function WooThemes_Testimonials_Submission_Form() {
-	return WooThemes_Testimonials_Submission_Form::instance();
+function WooThemes_Testimonials_Submission_Form () {
+	return WooThemes_Testimonials_Submission_Form::instance( __FILE__ );
 } // End Starter_Plugin()
 
 WooThemes_Testimonials_Submission_Form();
+
+function Submission_Form () {
+	return Submission_Form::instance( __FILE__ );
+} // End Starter_Plugin()
+
+function Captcha_Integration () {
+	return Captcha_Integration::instance( __FILE__ );
+} // End Starter_Plugin()
 
 /**
  * Main WooThemes_Testimonials_Submission_Form Class
@@ -57,6 +65,14 @@ final class WooThemes_Testimonials_Submission_Form {
 	 * @since   1.0.0
 	 */
 	public $token;
+
+	/**
+	 * File.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $file;
 
 	/**
 	 * The version number.
@@ -90,23 +106,30 @@ final class WooThemes_Testimonials_Submission_Form {
 	 */
 	public function __construct ( $file ) {
 		$this->token 			= 'woothemes-testimonials-submission-form';
+		$this->file 			= $file;
 		$this->plugin_url 		= plugin_dir_url( __FILE__ );
 		$this->plugin_path 		= plugin_dir_path( __FILE__ );
 		$this->version 			= '1.0.0';
 
 		// Main plugin class
 		require_once( 'classes/class-submission-form.php' );
-		$this->submission_form = Submission_Form::instance();
 
 		// Captcha integration class
 		require_once( 'classes/class-captcha-integration.php' );
-		$this->captcha = Captcha_Integration::instance();
+
+		Submission_Form();
+		Captcha_Integration();
+
+		require_once( 'templates/woothemes-testimonials-submission-form-template.php' );
 
 
 		register_activation_hook( __FILE__, array( $this, 'install' ) );
-		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
+
+		$this->load_plugin_textdomain();
+		add_action( 'init', array( $this, 'load_localisation' ), 0 );
 
 	} // End __construct()
+
 
 	/**
 	 * Main WooThemes_Testimonials_Submission_Form Instance
@@ -118,11 +141,35 @@ final class WooThemes_Testimonials_Submission_Form {
 	 * @see WooThemes_Testimonials_Submission_Form()
 	 * @return Main WooThemes_Testimonials_Submission_Form instance
 	 */
-	public static function instance () {
+	public static function instance ( $file ) {
 		if ( is_null( self::$_instance ) )
-			self::$_instance = new self();
+			self::$_instance = new self( $file );
 		return self::$_instance;
 	} // End instance()
+
+	/**
+	 * Load the plugin's localisation file.
+	 * @access public
+	 * @since 1.0.0
+	 * @return void
+	 */
+	public function load_localisation () {
+		load_plugin_textdomain( 'wooThemes-testimonials-submission-form', false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
+	} // End load_localisation()
+
+	/**
+	 * Load the plugin textdomain from the main WordPress "languages" folder.
+	 * @since  1.0.0
+	 * @return  void
+	 */
+	public function load_plugin_textdomain () {
+	    $domain = 'wooThemes-testimonials-submission-form';
+	    // The "plugin_locale" filter is also used in load_plugin_textdomain()
+	    $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
+
+	    load_textdomain( $domain, WP_LANG_DIR . '/' . $domain . '/' . $domain . '-' . $locale . '.mo' );
+	    load_plugin_textdomain( $domain, FALSE, dirname( plugin_basename( $this->file ) ) . '/lang/' );
+	} // End load_plugin_textdomain()
 
 	/**
 	 * Cloning is forbidden.
