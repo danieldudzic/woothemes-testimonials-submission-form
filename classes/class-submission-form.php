@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
  * @subpackage Woothemes_Testimonials
  * @category Plugin
  * @author Danny
- * @since 1.6.0
+ * @since 1.0.0
  */
 class Submission_Form {
 
@@ -29,6 +29,14 @@ class Submission_Form {
 	 * @since   1.0.0
 	 */
 	public $file;
+
+	/**
+	 * The plugin directory URL.
+	 * @var     string
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $plugin_url;
 
 	/**
 	 * The assets directory URL.
@@ -74,19 +82,20 @@ class Submission_Form {
 	 * Constructor function.
 	 *
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function __construct( $file ) {
 		$this->file = $file;
-		$this->assets_url = esc_url( trailingslashit( plugins_url( '/assets/', dirname( $file ) ) ) );
+		$this->plugin_url = plugin_dir_url( $this->file );
+		$this->assets_url = esc_url( trailingslashit( $this->plugin_url ) . 'assets/' );
 		$this->errors = array();
 
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_submission_form_styles' ) );
-		add_action( 'woothemes_testimonials_process_params', array( $this, 'process_notify_option' ) );
-		add_action( 'woothemes_testimonials_after_form_fields', array( $this, 'generate_nonce_field' ) );
+		add_action( 'woothemes_testimonials_submission_form_process_params', array( $this, 'process_notify_option' ) );
+		add_action( 'woothemes_testimonials_submission_form_after_form_fields', array( $this, 'generate_nonce_field' ) );
 		add_action( 'init', array( $this, 'process_submission_form' ) );
-		add_action( 'woothemes_testimonials_before_form', array( $this, 'print_response' ) );
+		add_action( 'woothemes_testimonials_submission_form_before_form', array( $this, 'print_response' ) );
 
 	} // End __construct()
 
@@ -109,11 +118,11 @@ class Submission_Form {
 	 * Enqueue testimonials submission form CSS.
 	 *
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function enqueue_submission_form_styles () {
-		wp_register_style( 'woothemes-testimonials-submission-form', $this->assets_url . '/css/form.css');
+		wp_register_style( 'woothemes-testimonials-submission-form', $this->assets_url . 'css/form.css');
 		wp_enqueue_style( 'woothemes-testimonials-submission-form' );
 	} // End enqueue_submission_form_styles()
 
@@ -122,7 +131,7 @@ class Submission_Form {
 	 *
 	 * @param array $args submission form parameters.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return array
 	 */
 	public function process_parameters( $args ) {
@@ -135,7 +144,7 @@ class Submission_Form {
 		$args = wp_parse_args( $args, $defaults );
 
 		// Hook for handling the parameters.
-		do_action( 'woothemes_testimonials_process_params', $args );
+		do_action( 'woothemes_testimonials_submission_form_process_params', $args );
 
 		return $args;
 	} // End process_parameters()
@@ -144,55 +153,55 @@ class Submission_Form {
 	 * Register form fields.
 	 *
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return array Submission form fields.
 	 */
 	public function get_submission_form_fields () {
 		$fields = array();
 
-		$fields['woothemes_testimonials_name'] = array(
+		$fields['woothemes_testimonials_submission_form_name'] = array(
 							  'label' => __( 'Name', 'woothemes-testimonials' ),
 							  'type' => 'text',
 							  'required' => true
 						  );
 
-		$fields['woothemes_testimonials_content'] = array(
+		$fields['woothemes_testimonials_submission_form_content'] = array(
 							  'label' => __( 'Testimonial', 'woothemes-testimonials' ),
 							  'type' => 'textarea',
 							  'required' => true
 						  );
 
-		$fields['woothemes_testimonials_email'] = array(
+		$fields['woothemes_testimonials_submission_form_email'] = array(
 							  'label' => __( 'E-mail address ( Gravatar )', 'woothemes-testimonials' ),
 							  'type' => 'email',
 							  'required' => true
 						  );
 
-		$fields['woothemes_testimonials_byline'] = array(
+		$fields['woothemes_testimonials_submission_form_byline'] = array(
 							  'label' => __( 'Byline', 'woothemes-testimonials' ),
 							  'type' => 'text',
 							  'required' => false
 						  );
 
-		$fields['woothemes_testimonials_website_url'] = array(
+		$fields['woothemes_testimonials_submission_form_website_url'] = array(
 							  'label' => __( 'Website', 'woothemes-testimonials' ),
 							  'type' => 'website_url',
 							  'required' => false
 						  );
 
-		$fields['woothemes_testimonials_checking'] = array(
+		$fields['woothemes_testimonials_submission_form_checking'] = array(
 							  'label' => __( 'Checking <small>( If you want to submit this form, do not enter anything in this field. )</small>', 'woothemes-testimonials' ),
 							  'type' => 'checking',
 							  'required' => false
 						  );
 
-		$fields['woothemes_testimonials_submit'] = array(
+		$fields['woothemes_testimonials_submission_form_submit'] = array(
 							  'label' => __( 'Submit', 'woothemes-testimonials' ),
 							  'type' => 'submit',
 							  'required' => false
 						  );
 
-		$fields['woothemes_testimonials_submission'] = array(
+		$fields['woothemes_testimonials_submission_form_submission'] = array(
 							  'type' => 'hidden',
 							  'required' => false,
 							  'value' => '1'
@@ -206,67 +215,67 @@ class Submission_Form {
 	 * Generate a nonce for the submission form.
 	 *
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function generate_nonce_field () {
-		wp_nonce_field( 'woothemes_testimonials_item_nonce', 'woothemes_testimonials_item_submit' );
+		wp_nonce_field( 'woothemes_testimonials_submission_form_item_nonce', 'woothemes_testimonials_submission_form_item_submit' );
 	} // End generate_nonce_field()
 
 	/**
 	 * Process the submitted testimonial data.
 	 *
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function process_submission_form () {
-		if ( isset( $_POST['woothemes_testimonials_submission'] ) && '1' == $_POST['woothemes_testimonials_submission'] ) {
+		if ( isset( $_POST['woothemes_testimonials_submission_form_submission'] ) && '1' == $_POST['woothemes_testimonials_submission_form_submission'] ) {
 
 			$testimonial_data_raw = $_POST;
 
-			$testimonial_data['woothemes_testimonials_name'] = sanitize_user( $_POST['woothemes_testimonials_name'] );
-			$testimonial_data['woothemes_testimonials_content'] = sanitize_text_field( $_POST['woothemes_testimonials_content'] );
-			$testimonial_data['woothemes_testimonials_email'] = sanitize_email( $_POST['woothemes_testimonials_email'] );
-			$testimonial_data['woothemes_testimonials_byline'] = sanitize_text_field( $_POST['woothemes_testimonials_byline'] );
-			$testimonial_data['woothemes_testimonials_website_url'] = esc_url_raw( $_POST['woothemes_testimonials_website_url'] );
+			$testimonial_data['woothemes_testimonials_submission_form_name'] = sanitize_user( $_POST['woothemes_testimonials_submission_form_name'] );
+			$testimonial_data['woothemes_testimonials_submission_form_content'] = sanitize_text_field( $_POST['woothemes_testimonials_submission_form_content'] );
+			$testimonial_data['woothemes_testimonials_submission_form_email'] = sanitize_email( $_POST['woothemes_testimonials_submission_form_email'] );
+			$testimonial_data['woothemes_testimonials_submission_form_byline'] = sanitize_text_field( $_POST['woothemes_testimonials_submission_form_byline'] );
+			$testimonial_data['woothemes_testimonials_submission_form_website_url'] = esc_url_raw( $_POST['woothemes_testimonials_submission_form_website_url'] );
 
 			$testimonial_hooked_data_raw = array_diff_key( $_POST, $testimonial_data );
 
 			// Only proceed with saving the Testimonial if the honeypot is empty.
-			if ( $testimonial_data_raw['woothemes_testimonials_checking'] != '' ) {
+			if ( $testimonial_data_raw['woothemes_testimonials_submission_form_checking'] != '' ) {
 				// Spam
-				$this->generate_response( __( 'In order to submit a new testimonial, please leave the <strong>Checking</strong> field empty.', 'woothemes-testimonials' ), 'error' );
+				$this->generate_response( __( 'In order to submit a new testimonial, please leave the <strong>Checking</strong> field empty.', 'woothemes-testimonials-submission-form' ), 'error' );
 
 			} else {
 
 				// Make sure the form came from the location on the current site and not somewhere else.
-				if ( isset( $_POST['woothemes_testimonials_item_submit'] ) && wp_verify_nonce( $_POST['woothemes_testimonials_item_submit'], 'woothemes_testimonials_item_nonce' ) ) {
+				if ( isset( $_POST['woothemes_testimonials_submission_form_item_submit'] ) && wp_verify_nonce( $_POST['woothemes_testimonials_submission_form_item_submit'], 'woothemes_testimonials_submission_form_item_nonce' ) ) {
 
 					// If the submitted data will pass the validation, let's go and add the testimonial.
 					if ( $this->validate_testimonial_data( $testimonial_data, $testimonial_data_raw, $testimonial_hooked_data_raw ) == true ) {
 
 						if ( $this->add_testimonial( $testimonial_data ) ) {
 							// Success
-							$this->generate_response( __( 'Your testimonial has been submitted and is now awaiting moderation.', 'woothemes-testimonials' ), 'success' );
+							$this->generate_response( __( 'Your testimonial has been submitted and is now awaiting moderation.', 'woothemes-testimonials-submission-form' ), 'success' );
 
-							if( get_option( '_woothemes_testimonials_moderator_emails' ) != '' ) {
+							if( get_option( '_woothemes_testimonials_submission_form_moderator_emails' ) != '' ) {
 								// Send an email notification to the moderator(s).
 								$this->notify_moderators( $testimonial_data );
 							}
 						} else {
 							// Failure
-							$this->generate_response( __( 'Your testimonial data seems to be correct, but something went wrong. Unfortunately your testimonial could not be submitted.', 'woothemes-testimonials' ), 'error' );
+							$this->generate_response( __( 'Your testimonial data seems to be correct, but something went wrong. Unfortunately your testimonial could not be submitted.', 'woothemes-testimonials-submission-form' ), 'error' );
 						}
 					} else {
 						// Validation failed.
 						$this->generate_error_notices();
-						$this->generate_response( __( 'Unfortunately your testimonial could not be submitted.', 'woothemes-testimonials' ), 'error');
+						$this->generate_response( __( 'Unfortunately your testimonial could not be submitted.', 'woothemes-testimonials-submission-form' ), 'error');
 					}
 
 				} else {
 					// Someone is playing dirty.
-					$this->generate_response( __( 'Cheatin&#8217; huh?', 'woothemes-testimonials' ), 'error');
+					$this->generate_response( __( 'Cheatin&#8217; huh?', 'woothemes-testimonials-submission-form' ), 'error');
 				}
 
 			}
@@ -281,7 +290,7 @@ class Submission_Form {
 	 * @param array $testimonial_data_raw Unsanitized $_POST testimonial data.
 	 * @param array $testimonial_hooked_data_raw Unsanitized $_POST hooked testimonial data.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return bool
 	 */
 	public function validate_testimonial_data ( $testimonial_data, $testimonial_data_raw, $testimonial_hooked_data_raw ) {
@@ -290,7 +299,7 @@ class Submission_Form {
 		// Loops though all form fields.
 		foreach ( $fields as $field_name => $field_params ) {
 
-				if ( isset ( $testimonial_data_raw[ $field_name ] ) && $testimonial_data_raw[ $field_name ] == '' && $field_name != 'woothemes_testimonials_checking' ) {
+				if ( isset ( $testimonial_data_raw[ $field_name ] ) && $testimonial_data_raw[ $field_name ] == '' && $field_name != 'woothemes_testimonials_submission_form_checking' ) {
 					$this->errors['missing_content'][ $field_name ] = true;
 				}
 		}
@@ -316,7 +325,7 @@ class Submission_Form {
 	 *
 	 * @param array $testimonial_data_raw Unsanitized $_POST testimonial data.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function validate_required ( $testimonial_data_raw ) {
@@ -339,17 +348,17 @@ class Submission_Form {
 	 *
 	 * @param array $testimonial_data_raw Unsanitized $_POST testimonial data.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function validate_email ( $testimonial_data_raw ) {
 			// Makes sure the email has been submitted.
-			if ( !isset ( $this->errors['missing_content'][ 'woothemes_testimonials_email' ] ) ) {
+			if ( !isset ( $this->errors['missing_content'][ 'woothemes_testimonials_submission_form_email' ] ) ) {
 
-				if ( is_email( $testimonial_data_raw['woothemes_testimonials_email'] ) ) {
+				if ( is_email( $testimonial_data_raw['woothemes_testimonials_submission_form_email'] ) ) {
 					return true;
 				} else {
-					$this->errors['invalid_content']['woothemes_testimonials_email'] = true;
+					$this->errors['invalid_content']['woothemes_testimonials_submission_form_email'] = true;
 				}
 
 			}
@@ -360,17 +369,17 @@ class Submission_Form {
 	 *
 	 * @param array $testimonial_data Sanitized $_POST testimonial data.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function validate_url ( $testimonial_data ) {
 		// Makes sure the URL has been submitted.
-		if ( !isset ( $this->errors['missing_content'][ 'woothemes_testimonials_website_url' ] ) ) {
+		if ( !isset ( $this->errors['missing_content'][ 'woothemes_testimonials_submission_form_website_url' ] ) ) {
 
-			if( filter_var( $testimonial_data['woothemes_testimonials_website_url'], FILTER_VALIDATE_URL ) ){
+			if( filter_var( $testimonial_data['woothemes_testimonials_submission_form_website_url'], FILTER_VALIDATE_URL ) ){
 				return true;
 			} else {
-				$this->errors['invalid_content']['woothemes_testimonials_website_url'] = true;
+				$this->errors['invalid_content']['woothemes_testimonials_submission_form_website_url'] = true;
 			}
 
 		}
@@ -382,7 +391,7 @@ class Submission_Form {
 	 * @param string $message
 	 * @param string $type
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function generate_response ( $message = '', $type = 'error' ) {
@@ -413,7 +422,7 @@ class Submission_Form {
 	 * Generate error notices.
 	 *
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function generate_error_notices () {
@@ -422,7 +431,7 @@ class Submission_Form {
 		// Missing required fields
 		if( isset ( $this->errors['missing_required'] ) ) {
 			$field_labels = array();
-			$message_html_before = __( 'The following fields are required: ', 'woothemes-testimonials' );
+			$message_html_before = __( 'The following fields are required: ', 'woothemes-testimonials-submission-form' );
 			$message_html_after = '';
 			foreach ( $this->errors['missing_required'] as $k => $v ) {
 				$field_labels[] = $fields[ $k ]['label'];
@@ -438,7 +447,7 @@ class Submission_Form {
 		// Invalid fields
 		if( isset ( $this->errors['invalid_content'] ) ) {
 			$field_labels = array();
-			$message_html_before = __( 'Please make sure, you submit correct information in the following fields: ', 'woothemes-testimonials' );
+			$message_html_before = __( 'Please make sure, you submit correct information in the following fields: ', 'woothemes-testimonials-submission-form' );
 			$message_html_after = '';
 
 			foreach ( $this->errors['invalid_content'] as $k => $v ) {
@@ -458,7 +467,7 @@ class Submission_Form {
 	 *
 	 * @param string $message
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function add_response_item ( $message ) {
@@ -469,7 +478,7 @@ class Submission_Form {
 	 * Print the response.
 	 *
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function print_response ( ) {
@@ -480,12 +489,12 @@ class Submission_Form {
 	 * Print a notice above the form ( before it's submitted ).
 	 *
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function initial_notice() {
 		if( !isset ( $this->response ) ) {
-			$response_items = apply_filters( 'woothemes_testimonials_add_notice',  array() );
+			$response_items = apply_filters( 'woothemes_testimonials_submission_form_add_notice',  array() );
 
 			if( !empty( $response_items ) ) {
 				foreach( $response_items as $item ){
@@ -506,11 +515,11 @@ class Submission_Form {
 	 * @param array $testimonial_data_raw Unsanitized $_POST testimonial data.
 	 * @param array $errors Field errors.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return array Field errors.
 	 */
 	public function validate_hooked_field_data ( $fields, $data, $errors ) {
-		$errors = apply_filters( 'woothemes_testimonials_validate_hooked_data', $fields, $data, $errors );
+		$errors = apply_filters( 'woothemes_testimonials_submission_form_validate_hooked_data', $fields, $data, $errors );
         return $errors;
 	} // End validate_hooked_field_data()
 
@@ -519,30 +528,30 @@ class Submission_Form {
 	 *
 	 * @param array $testimonial_data Sanitized $_POST testimonial data.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return mixed The ID of the post if the testimonial is successfully added to the database. On failure, it returns 0 if $wp_error is set to false, or a WP_Error object if $wp_error is set to true.
 	 */
 	public function add_testimonial ( $testimonial_data ) {
 		$testimonial_information = array(
-						    'post_title' => $testimonial_data['woothemes_testimonials_name'],
-						    'post_content' => $testimonial_data['woothemes_testimonials_content'],
+						    'post_title' => $testimonial_data['woothemes_testimonials_submission_form_name'],
+						    'post_content' => $testimonial_data['woothemes_testimonials_submission_form_content'],
 						    'post_type' => 'testimonial',
-						    'post_status' => apply_filters( 'woothemes_testimonials_submission_status', 'draft' )
+						    'post_status' => apply_filters( 'woothemes_testimonials_submission_form_submission_status', 'draft' )
 						);
 
 		$post_id = wp_insert_post( $testimonial_information );
 		$this->testimonial_id = $post_id;
 
-		if( $testimonial_data['woothemes_testimonials_email'] != '') {
-			update_post_meta( $post_id, '_gravatar_email', $testimonial_data['woothemes_testimonials_email'] );
+		if( $testimonial_data['woothemes_testimonials_submission_form_email'] != '') {
+			update_post_meta( $post_id, '_gravatar_email', $testimonial_data['woothemes_testimonials_submission_form_email'] );
 		}
 
-		if( $testimonial_data['woothemes_testimonials_byline'] != '') {
-			update_post_meta( $post_id, '_byline', $testimonial_data['woothemes_testimonials_byline'] );
+		if( $testimonial_data['woothemes_testimonials_submission_form_byline'] != '') {
+			update_post_meta( $post_id, '_byline', $testimonial_data['woothemes_testimonials_submission_form_byline'] );
 		}
 
-		if( $testimonial_data['woothemes_testimonials_website_url'] != '') {
-			update_post_meta( $post_id, '_url', $testimonial_data['woothemes_testimonials_website_url'] );
+		if( $testimonial_data['woothemes_testimonials_submission_form_website_url'] != '') {
+			update_post_meta( $post_id, '_url', $testimonial_data['woothemes_testimonials_submission_form_website_url'] );
 		}
 
 		return $post_id;
@@ -553,23 +562,23 @@ class Submission_Form {
 	 *
 	 * @param array $args submission_form function parameters.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function process_notify_option ( $args ) {
 		// If the 'notify' parameter is passed, the moderator(s) will receive email notifications.
 		if( isset( $args['notify'] ) && $args['notify'] != '' ) {
 
-			$saved_emails = get_option( '_woothemes_testimonials_moderator_emails' );
+			$saved_emails = get_option( '_woothemes_testimonials_submission_form_moderator_emails' );
 
 			// Save the email(s) as an option.
 			if( $saved_emails == '' ) {
-			    add_option( '_woothemes_testimonials_moderator_emails', $args['notify'] );
+			    add_option( '_woothemes_testimonials_submission_form_moderator_emails', $args['notify'] );
 		    } elseif ( $saved_emails != $args['notify'] ) {
-			    update_option( '_woothemes_testimonials_moderator_emails', $args['notify'] );
+			    update_option( '_woothemes_testimonials_submission_form_moderator_emails', $args['notify'] );
 		    }
 		} else {
-			delete_option( '_woothemes_testimonials_moderator_emails' );
+			delete_option( '_woothemes_testimonials_submission_form_moderator_emails' );
 		}
 	} // End process_notify_option()
 
@@ -579,44 +588,46 @@ class Submission_Form {
 	 *
 	 * @param array $testimonial_data Sanitized $_POST testimonial data.
 	 * @access public
-	 * @since 1.6.0
+	 * @since 1.0.0
 	 * @return void
 	 */
 	public function notify_moderators ( $testimonial_data ) {
-		$author_name =  	$testimonial_data['woothemes_testimonials_name'];
-		$content = 			$testimonial_data['woothemes_testimonials_content'];
-		$author_email = 	$testimonial_data['woothemes_testimonials_email'];
-		$author_url = 		$testimonial_data['woothemes_testimonials_website_url'];
-		$author_byline = 	$testimonial_data['woothemes_testimonials_byline'];
+		$author_name =  	$testimonial_data['woothemes_testimonials_submission_form_name'];
+		$content = 			$testimonial_data['woothemes_testimonials_submission_form_content'];
+		$author_email = 	$testimonial_data['woothemes_testimonials_submission_form_email'];
+		$author_url = 		$testimonial_data['woothemes_testimonials_submission_form_website_url'];
+		$author_byline = 	$testimonial_data['woothemes_testimonials_submission_form_byline'];
 		$blogname = 		wp_specialchars_decode( get_option('blogname'), ENT_QUOTES );
 
-		$message  = '<h4>' . __( 'A new testimonial is waiting for your approval.', 'woothemes-testimonials' ) . '</h4><br />';
-		$message .= '<p>' . sprintf( __( '<h5>Author</h5> %1$s <%2$s>', 'woothemes-testimonials' ), $author_name, $author_email ) . '</p><br />';
-		$message .= '<p>' . sprintf( __( '<h5>E-mail</h5> %s', 'woothemes-testimonials' ), $author_email ) . '</p><br />';
-		$message .= '<p>' . sprintf( __( '<h5>URL</h5> %s', 'woothemes-testimonials' ), $author_url ) . '</p><br />';
-		$message .= '<p>' . __( '<h5>Testimonial</h5>', 'woothemes-testimonials' ) . '</p><p>' . $content . '</p><br />';
+		$message  = '<h4>' . __( 'A new testimonial is waiting for your approval.', 'woothemes-testimonials-submission-form' ) . '</h4><br />';
+		$message .= '<p>' . sprintf( __( '<h5>Author</h5> %1$s <%2$s>', 'woothemes-testimonials-submission-form' ), $author_name, $author_email ) . '</p><br />';
+		$message .= '<p>' . sprintf( __( '<h5>E-mail</h5> %s', 'woothemes-testimonials-submission-form' ), $author_email ) . '</p><br />';
+		$message .= '<p>' . sprintf( __( '<h5>URL</h5> %s', 'woothemes-testimonials-submission-form' ), $author_url ) . '</p><br />';
+		$message .= '<p>' . __( '<h5>Testimonial</h5>', 'woothemes-testimonials-submission-form' ) . '</p><p>' . $content . '</p><br />';
 
-		$message .= '<p>' . sprintf( __( '<h5>You can manage the submission here: %s</h5>', 'woothemes-testimonials' ),  admin_url( 'post.php?action=edit&post=' . $this->testimonial_id ) ) . '</p>';
+		$message .= '<p>' . sprintf( __( '<h5>You can manage the submission here: %s</h5>', 'woothemes-testimonials-submission-form' ),  admin_url( 'post.php?action=edit&post=' . $this->testimonial_id ) ) . '</p>';
 
-		$subject = sprintf( __( '[%1$s] Please moderate a new testimonial from "%2$s".', 'woothemes-testimonials' ), $blogname, $author_name );
+		$subject = sprintf( __( '[%1$s] Please moderate a new testimonial from "%2$s".', 'woothemes-testimonials-submission-form' ), $blogname, $author_name );
 
 		$headers = "From: " . strip_tags( get_option( 'admin_email' ) ) . "\r\n";
 		$headers .= "MIME-Version: 1.0\r\n";
 		$headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
-		$moderator_emails = explode( ',', get_option( '_woothemes_testimonials_moderator_emails' ) );
+		$moderator_emails = explode( ',', get_option( '_woothemes_testimonials_submission_form_moderator_emails' ) );
 
 		// Filter the testimonial notification email content.
-		$message = apply_filters( 'woothemes_testimonials_notification_content', $message );
+		$message = apply_filters( 'woothemes_testimonials_submission_form_notification_content', $message );
 
 		// Filter the testimonial notification email subject.
-		$subject = apply_filters( 'woothemes_testimonials_notification_subject', $subject );
+		$subject = apply_filters( 'woothemes_testimonials_submission_form_notification_subject', $subject );
 
 		// Filter the testimonial notification email headers.
-		$headers = apply_filters( 'woothemes_testimonials_notification_headers', $headers );
+		$headers = apply_filters( 'woothemes_testimonials_submission_form_notification_headers', $headers );
 
 		foreach ( $moderator_emails as $email ) {
-			wp_mail( $email, wp_specialchars_decode( $subject ), $message, $headers );
+			if ( is_email( $email ) ) {
+				wp_mail( $email, wp_specialchars_decode( $subject ), $message, $headers );
+			}
 		}
 	} // End notify_moderators()
 

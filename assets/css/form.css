@@ -49,9 +49,9 @@
 #testimonials-submission .required {
   color: red;
 }
-#testimonials-submission .woothemes_testimonials_checking,
-#testimonials-submission .woothemes_testimonials_checking label,
-#testimonials-submission .woothemes_testimonials_checking input {
+#testimonials-submission .woothemes_testimonials_submission_form_checking,
+#testimonials-submission .woothemes_testimonials_submission_form_checking label,
+#testimonials-submission .woothemes_testimonials_submission_form_checking input {
   left: -9999px;
   position: absolute;
   top: -9999px;

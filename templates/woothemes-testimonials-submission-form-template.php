@@ -28,16 +28,16 @@ function woothemes_testimonials_form ( $args = '' ) {
 	$html = '';
 
 	ob_start();
-	do_action( 'woothemes_testimonials_before_form' );
+	do_action( 'woothemes_testimonials_submission_form_before_form' );
     $html .= ob_get_contents();
     ob_end_clean();
 
 	$html .= '<div id="testimonials-submission">';
-	$html .= '<h2>' . __( 'Add a testimonial', 'woothemes-testimonials' ) . '</h2>';
+	$html .= '<h2>' . __( 'Add a testimonial', 'woothemes-testimonials-submission-form' ) . '</h2>';
 	$html .= '<form method="post" class="testimonials-submission">';
 
 	ob_start();
-	do_action( 'woothemes_testimonials_before_form_fields' );
+	do_action( 'woothemes_testimonials_submission_form_before_form_fields' );
     $html .= ob_get_contents();
     ob_end_clean();
 
@@ -51,7 +51,7 @@ function woothemes_testimonials_form ( $args = '' ) {
 		}
 
 		if ( $field_params['required'] == true ) {
-			$required = __( '<span class="required">*</span>', 'woothemes-testimonials' );
+			$required = __( '<span class="required">*</span>', 'woothemes-testimonials-submission-form' );
 		} else {
 			$required = '';
 		}
@@ -59,7 +59,7 @@ function woothemes_testimonials_form ( $args = '' ) {
 		if ( $field_params['type'] == 'submit' ) {
 
 			ob_start();
-			do_action( 'woothemes_testimonials_before_submit_field' );
+			do_action( 'woothemes_testimonials_submission_form_before_submit_field' );
 			$html .= ob_get_contents();
 			ob_end_clean();
 
@@ -114,7 +114,7 @@ function woothemes_testimonials_form ( $args = '' ) {
 	}
 
 	ob_start();
-	do_action( 'woothemes_testimonials_after_form_fields' );
+	do_action( 'woothemes_testimonials_submission_form_after_form_fields' );
     $html .= ob_get_contents();
     ob_end_clean();
 
@@ -122,7 +122,7 @@ function woothemes_testimonials_form ( $args = '' ) {
 	$html .= '</div>';
 
 	ob_start();
-	do_action( 'woothemes_testimonials_after_form' );
+	do_action( 'woothemes_testimonials_submission_form_after_form' );
     $html .= ob_get_contents();
     ob_end_clean();
 

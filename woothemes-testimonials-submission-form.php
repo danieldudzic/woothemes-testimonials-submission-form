@@ -30,8 +30,6 @@ function WooThemes_Testimonials_Submission_Form () {
 	return WooThemes_Testimonials_Submission_Form::instance( __FILE__ );
 } // End Starter_Plugin()
 
-WooThemes_Testimonials_Submission_Form();
-
 function Submission_Form () {
 	return Submission_Form::instance( __FILE__ );
 } // End Starter_Plugin()
@@ -39,6 +37,8 @@ function Submission_Form () {
 function Captcha_Integration () {
 	return Captcha_Integration::instance( __FILE__ );
 } // End Starter_Plugin()
+
+WooThemes_Testimonials_Submission_Form();
 
 /**
  * Main WooThemes_Testimonials_Submission_Form Class
@@ -117,11 +117,12 @@ final class WooThemes_Testimonials_Submission_Form {
 		// Captcha integration class
 		require_once( 'classes/class-captcha-integration.php' );
 
-		Submission_Form();
-		Captcha_Integration();
 
 		require_once( 'templates/woothemes-testimonials-submission-form-template.php' );
 
+		Submission_Form();
+
+		Captcha_Integration();
 
 		register_activation_hook( __FILE__, array( $this, 'install' ) );
 
@@ -154,7 +155,7 @@ final class WooThemes_Testimonials_Submission_Form {
 	 * @return void
 	 */
 	public function load_localisation () {
-		load_plugin_textdomain( 'wooThemes-testimonials-submission-form', false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
+		load_plugin_textdomain( 'woothemes-testimonials-submission-form', false, dirname( plugin_basename( $this->file ) ) . '/lang/' );
 	} // End load_localisation()
 
 	/**
@@ -163,7 +164,7 @@ final class WooThemes_Testimonials_Submission_Form {
 	 * @return  void
 	 */
 	public function load_plugin_textdomain () {
-	    $domain = 'wooThemes-testimonials-submission-form';
+	    $domain = 'woothemes-testimonials-submission-form';
 	    // The "plugin_locale" filter is also used in load_plugin_textdomain()
 	    $locale = apply_filters( 'plugin_locale', get_locale(), $domain );
 
