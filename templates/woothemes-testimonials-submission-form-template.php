@@ -2,24 +2,22 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 /**
- * Enable the usage of do_action( 'woothemes_testimonials_form' ) to display a slideshow within a theme/plugin.
+ * Enable the usage of do_action( 'woothemes_testimonials_submission_form' ) to display a slideshow within a theme/plugin.
  *
  * @since  1.0.6
  */
-add_action( 'woothemes_testimonials_form', 'woothemes_testimonials_form' );
+add_action( 'woothemes_testimonials_submission_form', 'woothemes_testimonials_submission_form' );
 
-if ( ! function_exists( 'woothemes_testimonials_form' ) ) {
+if ( ! function_exists( 'woothemes_testimonials_submission_form' ) ) {
 /**
  * Generate the testimonials submission form html.
  *
- * @param array $args submission_form function parameters.
+ * @param array $args woothemes_testimonials_submission_form function parameters.
  * @access public
  * @since 1.6.0
  * @return string Submission form html.
  */
-function woothemes_testimonials_form ( $args = '' ) {
-	global $woothemes_testimonials_form;
-
+function woothemes_testimonials_submission_form ( $args = '' ) {
 	$args = Submission_Form()->process_parameters( $args );
 
 	// Print an initial notice.
@@ -133,20 +131,19 @@ function woothemes_testimonials_form ( $args = '' ) {
 
 	// Should only run is "echo" is set to true.
 	echo $html;
-} // End woothemes_testimonials_form()
+} // End woothemes_testimonials_submission_form()
 }
 
-if ( ! function_exists( 'woothemes_testimonials_form_shortcode' ) ) {
+if ( ! function_exists( 'woothemes_testimonials_submission_form_shortcode' ) ) {
 /**
  * Testimonials submission form shortcode function.
  *
- * @param array $atts [woothemes_testimonials_form] shortcode parameters.
+ * @param array $atts [woothemes_testimonials_submission_form] shortcode parameters.
  * @access public
  * @since 1.6.0
  * @return void
  */
-function woothemes_testimonials_form_shortcode ( $atts ) {
-	global $woothemes_testimonials_form;
+function woothemes_testimonials_submission_form_shortcode ( $atts ) {
 	$args = (array)$atts;
 
 	$defaults = array(
@@ -155,9 +152,9 @@ function woothemes_testimonials_form_shortcode ( $atts ) {
 
 	$args = wp_parse_args( $defaults, $args );
 
-	return woothemes_testimonials_form( $args );
-} // End woothemes_testimonials_form_shortcode()
+	return woothemes_testimonials_submission_form( $args );
+} // End woothemes_testimonials_submission_form_shortcode()
 }
 
-add_shortcode( 'woothemes_testimonials_form', 'woothemes_testimonials_form_shortcode' );
+add_shortcode( 'woothemes_testimonials_submission_form', 'woothemes_testimonials_submission_form_shortcode' );
 ?>

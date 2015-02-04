@@ -13,8 +13,22 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly.
  * @since 1.0.0
  */
 class Captcha_Integration {
+
+	/**
+	 * Status of the Captcha plugin.
+	 * @var     bool
+	 * @access  public
+	 * @since   1.0.0
+	 */
 	public $plugin_enabled;
-	public $captcha_option;
+
+	/**
+	 * Status of the "captcha" parameter in the shortcode.
+	 * @var     bool
+	 * @access  public
+	 * @since   1.0.0
+	 */
+	public $shortcode_option_enabled;
 
 	/**
 	 * Captcha_Integration The single instance of Captcha_Integration.
@@ -34,15 +48,15 @@ class Captcha_Integration {
 	public function __construct( $file ) {
 		add_action( 'woothemes_testimonials_submission_form_process_params', array( $this, 'load_captcha' ) );
 
-		$this->captcha_option = get_option( '_woothemes_testimonials_submission_form_captcha' );
+		$this->shortcode_option_enabled = get_option( '_woothemes_testimonials_submission_form_captcha' );
 
 		// Check if the plugin is active.
-		$this->captcha_check();
+		$this->plugin_check();
 
-		add_filter( 'woothemes_testimonials_submission_form_fields', array( $this, 'register_captcha_fields' ) );
-		add_filter( 'woothemes_testimonials_submission_form_validate_hooked_data', array( $this, 'validate_captcha_field' ), 10, 3 );
-
-
+		if( $this->plugin_enabled == true && $this->shortcode_option_enabled == true ) {
+			add_filter( 'woothemes_testimonials_submission_form_fields', array( $this, 'register_captcha_fields' ) );
+			add_filter( 'woothemes_testimonials_submission_form_validate_hooked_data', array( $this, 'validate_captcha_field' ), 10, 3 );
+		}
 	}
 
 	/**
@@ -68,20 +82,20 @@ class Captcha_Integration {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function captcha_check ( ) {
+	public function plugin_check ( ) {
 		// Captcha plugin integration.
 		if( function_exists( 'cptch_display_captcha_custom' ) && function_exists( 'cptch_check_custom_form' ) ) {
 			$this->plugin_enabled = true;
 		} else {
 			$this->plugin_enabled = false;
 		}
-	} // End captcha_check()
+	} // End plugin_check()
 
 	public function load_captcha( $args ) {
 
-		$this->process_captcha_option( $args );
+		$this->process_shortcode_option_enabled( $args );
 
-		if( $this->plugin_enabled == true && $this->captcha_option == true ) {
+		if( $this->plugin_enabled == true && $this->shortcode_option_enabled == true ) {
 			add_action( 'woothemes_testimonials_submission_form_before_submit_field', array( $this, 'output_external_captcha_field' ) );
 		}
 
@@ -95,7 +109,7 @@ class Captcha_Integration {
 	 * @since 1.0.0
 	 * @return void
 	 */
-	public function process_captcha_option ( $args ) {
+	public function process_shortcode_option_enabled ( $args ) {
 		if( isset( $args['captcha'] ) && $args['captcha'] != '' ) {
 
 			// Let's convert user input into a boolean
@@ -106,15 +120,15 @@ class Captcha_Integration {
 				add_filter( 'woothemes_testimonials_submission_form_add_notice', array( $this, 'generate_plugin_inactive_notice' ) );
 			}
 
-			if( $this->captcha_option != $args['captcha'] ) {
+			if( $this->shortcode_option_enabled != $args['captcha'] ) {
 			    update_option( '_woothemes_testimonials_submission_form_captcha', $args['captcha'] );
-			    $this->captcha_option = $args['captcha'];
+			    $this->shortcode_option_enabled = $args['captcha'];
 		    }
 
 		} else {
 			delete_option( '_woothemes_testimonials_submission_form_captcha' );
 		}
-	} // End process_captcha_option()
+	} // End process_shortcode_option_enabled()
 
 	/**
 	 * Generate a notice in case "captcha" param is set in the shortcode, but the plugin is inactive.

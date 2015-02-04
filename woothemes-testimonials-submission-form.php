@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Submission Form for Testimonials
+ * Plugin Name: Submission Form for Testimonials by WooThemes
  * Plugin URI: http://woothemes.com/
  * Description: A small, nifty plugin that extends Testimonials by WooThemes and enables your users testimonials submissions via a simple form.
  * Version: 1.0.0
