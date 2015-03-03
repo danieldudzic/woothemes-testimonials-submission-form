@@ -117,7 +117,6 @@ final class WooThemes_Testimonials_Submission_Form {
 		// Captcha integration class
 		require_once( 'classes/class-captcha-integration.php' );
 
-
 		require_once( 'templates/woothemes-testimonials-submission-form-template.php' );
 
 		Submission_Form();
